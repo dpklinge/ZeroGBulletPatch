@@ -2,11 +2,12 @@
 using HarmonyLib;
 using System;
 using UnityEngine;
+using ZeroGBulletPatch.Extensions;
 
 namespace ZeroGBulletPatch
 {
     
-    [BepInPlugin(ModId, ModName, "1.0.0")]
+    [BepInPlugin(ModId, ModName, "1.1.0")]
     [BepInProcess("Rounds.exe")]
     public class ZeroGBulletPatch : BaseUnityPlugin
     {
@@ -25,12 +26,13 @@ namespace ZeroGBulletPatch
 
     [Serializable]
     [HarmonyPatch(typeof(GeneralInput), "Update")]
-    class GeneralInputZeroGPatch
+    class GeneralInputArcTrajectoryCompensationPatch
     {
         // remove speed compensation (makes zero-g bullets actually shoot straight)
         private static void Postfix(GeneralInput __instance)
         {
-            if (((CharacterData)Traverse.Create(__instance).Field("data").GetValue()).weaponHandler.gun.gravity == 0)
+            var gun = ((CharacterData)Traverse.Create(__instance).Field("data").GetValue()).weaponHandler.gun;
+            if (gun.gravity == 0 || gun.GetAdditionalData().arcTrajectoryRotationalCompensationDisabled)
             {
                 __instance.aimDirection -= Vector3.up * 0.13f / Mathf.Clamp(((CharacterData)Traverse.Create(__instance).Field("data").GetValue()).weaponHandler.gun.projectileSpeed, 1f, 100f);
             }
