@@ -28,7 +28,7 @@ namespace ZeroGBulletPatch
     [HarmonyPatch(typeof(GeneralInput), "Update")]
     class GeneralInputArcTrajectoryCompensationPatch
     {
-        // remove speed compensation (makes zero-g bullets actually shoot straight)
+        // remove arc compensation (makes gun shoot slightly above target reticle, causes misses at zero gravity/other straight line mechanics)
         private static void Postfix(GeneralInput __instance)
         {
             var gun = ((CharacterData)Traverse.Create(__instance).Field("data").GetValue()).weaponHandler.gun;
